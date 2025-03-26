@@ -1,0 +1,13 @@
+version: '3.11-slim'
+
+services:
+  app:
+    image: securevoterid
+    env_file:
+      - .env
+
+secrets:
+  db_password:
+    external: true
+  api_key:
+    external: true
