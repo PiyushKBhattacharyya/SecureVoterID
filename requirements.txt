@@ -6,5 +6,5 @@ pillow
 python-dotenv
 gunicorn
 scikit-learn
-dlib
 face-recognition
+qrcode

@@ -1,13 +1,12 @@
-version: '3.11-slim'
+version: '3.8'  # Use a valid Docker Compose version
 
 services:
   app:
+    build:
+      context: .  # Build from the current directory
+      dockerfile: Dockerfile  # Specify Dockerfile
     image: securevoterid
     env_file:
-      - .env
-
-secrets:
-  db_password:
-    external: true
-  api_key:
-    external: true
+      - .env  # Ensure this file exists at the root
+    ports:
+      - "5000:5000"  # Expose necessary ports

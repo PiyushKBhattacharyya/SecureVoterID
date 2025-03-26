@@ -46,19 +46,20 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Get security settings from environment
+FACE_SIMILARITY_THRESHOLD = float(os.environ.get("FACE_SIMILARITY_THRESHOLD", "0.7").strip())
 # Face recognition settings - Higher values are more lenient (0.7-0.8 is a good balance)
-FACE_SIMILARITY_THRESHOLD = float(os.environ.get("FACE_SIMILARITY_THRESHOLD", 0.7))
+FACE_SIMILARITY_THRESHOLD = float(os.environ.get("FACE_SIMILARITY_THRESHOLD"))
 
 # Rate limiting settings
-RATE_LIMIT_VERIFICATION = int(os.environ.get("RATE_LIMIT_VERIFICATION", 10))
-RATE_LIMIT_REGISTRATION = int(os.environ.get("RATE_LIMIT_REGISTRATION", 5))
-RATE_LIMIT_LOGIN = int(os.environ.get("RATE_LIMIT_LOGIN", 10))
+RATE_LIMIT_VERIFICATION = int(os.environ.get("RATE_LIMIT_VERIFICATION"))
+RATE_LIMIT_REGISTRATION = int(os.environ.get("RATE_LIMIT_REGISTRATION"))
+RATE_LIMIT_LOGIN = int(os.environ.get("RATE_LIMIT_LOGIN"))
 
 # QR Code settings
-QR_CODE_EXPIRY_HOURS = int(os.environ.get("QR_CODE_EXPIRY_HOURS", 24))
+QR_CODE_EXPIRY_HOURS = int(os.environ.get("QR_CODE_EXPIRY_HOURS"))
 
 # Set session lifetime from environment or default to 30 days
-app.permanent_session_lifetime = timedelta(seconds=int(os.environ.get("SESSION_LIFETIME", 2592000)))
+app.permanent_session_lifetime = timedelta(seconds=int(os.environ.get("SESSION_LIFETIME")))
 
 # Set logging level
 log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
@@ -377,14 +378,11 @@ def verify():
                 expiration_time = (datetime.now() + timedelta(hours=QR_CODE_EXPIRY_HOURS)).strftime('%Y-%m-%d %H:%M:%S')
                 
                 # Create a secure hash to validate the QR code later
-                data_to_hash = f"{voter.voter_id}:{expiration_time}:{app.secret_key}"
+                data_to_hash = f"{voter.voter_id}:{expiration_time}:"
                 secure_hash = hashlib.sha256(data_to_hash.encode()).hexdigest()
                 
                 voter_data = {
-                    "voter_id": voter.voter_id,
-                    "name": voter.name,
-                    "email": voter.email,
-                    "dob": voter.dob.strftime('%Y-%m-%d'),
+                    "name": voter.name, 
                     "phone": voter.phone,
                     "verification_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     "expires_at": expiration_time,
@@ -600,7 +598,7 @@ def admin_dashboard():
 # For backward compatibility, redirect old admin URL to new dashboard
 @app.route('/admin')
 def admin():
-    return redirect(url_for('admin_login'))
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/voter/<voter_id>')
 @admin_login_required
@@ -658,10 +656,8 @@ def generate_qr(voter_id):
         secure_hash = hashlib.sha256(data_to_hash.encode()).hexdigest()
         
         voter_data = {
-            "voter_id": voter.voter_id,
             "name": voter.name,
             "email": voter.email,
-            "dob": voter.dob.strftime('%Y-%m-%d'),
             "phone": voter.phone,
             "generated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             "expires_at": expiration_time,
