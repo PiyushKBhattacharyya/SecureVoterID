@@ -1,0 +1,146 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-user-check me-2"></i>Voter Verification</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <strong>Verification Process:</strong>
+                            <ol class="mb-0 mt-1">
+                                <li>Enter your Voter ID</li>
+                                <li>Position your face in the camera</li>
+                                <li>Click the capture button when ready</li>
+                                <li>Submit for verification</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="verificationForm" action="{{ url_for('verify') }}" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="voter_id" class="form-label">Voter ID*</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                    <input type="text" class="form-control" id="voter_id" name="voter_id" required
+                                           placeholder="Enter your voter ID">
+                                </div>
+                                <div class="form-text">Enter the Voter ID you used during registration</div>
+                            </div>
+                            
+                            <div class="card bg-dark text-white mb-4">
+                                <div class="card-header bg-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Facial Recognition</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small">For successful verification:</p>
+                                    <ul class="small">
+                                        <li>Ensure good, even lighting on your face</li>
+                                        <li>Remove sunglasses or face coverings</li>
+                                        <li>Look directly at the camera</li>
+                                        <li>Keep a neutral expression</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="text-center mb-4">
+                                <div id="webcam-container" class="mb-3">
+                                    <video id="webcam" autoplay playsinline width="100%" height="auto" class="rounded"></video>
+                                    <div class="camera-controls">
+                                        <button type="button" id="capture-btn" class="btn btn-primary">
+                                            <i class="fas fa-camera"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="captured-container" class="mb-3 d-none">
+                                    <canvas id="captured-image" width="320" height="240" class="rounded"></canvas>
+                                    <div class="camera-controls">
+                                        <button type="button" id="recapture-btn" class="btn btn-warning">
+                                            <i class="fas fa-redo"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="face_data" name="face_data">
+                                
+                                <div class="alert alert-warning small mt-3">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Your face must match your registered image for successful verification.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" id="submit-btn" class="btn btn-success btn-lg" disabled>
+                            <i class="fas fa-check-circle me-2"></i>Verify Identity
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('register') }}" class="text-decoration-none">
+                        <i class="fas fa-user-plus me-1"></i> Not registered yet? Register here
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/webcam.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize webcam
+        initWebcam('webcam', 'captured-image', 'face_data', 'capture-btn', 'recapture-btn', 'submit-btn', 'webcam-container', 'captured-container');
+        
+        // Form validation
+        const form = document.getElementById('verificationForm');
+        form.addEventListener('submit', function(e) {
+            if (!document.getElementById('face_data').value) {
+                e.preventDefault();
+                showAlert('Please capture your face before submitting', 'warning');
+            }
+        });
+        
+        // Enable submit button if voter ID is entered and face is captured
+        const voterIdInput = document.getElementById('voter_id');
+        voterIdInput.addEventListener('input', checkFormValidity);
+        
+        function checkFormValidity() {
+            const faceData = document.getElementById('face_data').value;
+            const voterId = voterIdInput.value.trim();
+            const submitBtn = document.getElementById('submit-btn');
+            
+            if (faceData && voterId) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+        
+        // Monitor face data changes
+        const faceDataInput = document.getElementById('face_data');
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === "attributes" && mutation.attributeName === "value") {
+                    checkFormValidity();
+                }
+            });
+        });
+        
+        observer.observe(faceDataInput, { attributes: true });
+    });
+</script>
+{% endblock %}

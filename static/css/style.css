@@ -1,0 +1,197 @@
+/* Custom styles for the voter verification system */
+
+/* Body styling */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bs-dark-bg-subtle);
+}
+
+/* Footer always at bottom */
+.footer {
+    margin-top: auto;
+}
+
+/* Webcam container styling */
+#webcam-container, #captured-container {
+    border: 2px solid var(--bs-border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#webcam-container:hover, #captured-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+#webcam, #captured-image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+/* Camera controls */
+.camera-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.camera-controls .btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Card styling */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.card-header {
+    padding: 12px 15px;
+    font-weight: 600;
+}
+
+/* QR container */
+.qr-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    display: inline-block;
+    max-width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.qr-container:hover {
+    transform: scale(1.02);
+}
+
+.qr-container img {
+    max-width: 100%;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 85%;
+    font-weight: 500;
+    padding: 0.4em 0.7em;
+}
+
+/* Button animations */
+.btn {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:active {
+    transform: scale(0.96);
+}
+
+.btn-primary, .btn-success, .btn-info {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:hover, .btn-success:hover, .btn-info:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Table styling */
+.table {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Animation for page content */
+.card, .alert, .table {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .col-md-6 {
+        margin-bottom: 20px;
+    }
+    
+    .container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar, .footer, .alert, .btn, form {
+        display: none !important;
+    }
+    
+    .qr-container {
+        text-align: center;
+        margin: 0 auto;
+        box-shadow: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    body {
+        background-color: white;
+    }
+}

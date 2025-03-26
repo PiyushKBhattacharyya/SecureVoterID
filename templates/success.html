@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow text-center">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="fas fa-check-circle me-2"></i>Verification Successful</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-user-check me-2"></i>
+                    <strong>Your identity has been successfully verified!</strong>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Voter Information</h5>
+                            </div>
+                            <div class="card-body text-start">
+                                <p><strong>Voter ID:</strong> {{ voter.voter_id }}</p>
+                                <p><strong>Name:</strong> {{ voter.name }}</p>
+                                <p><strong>Email:</strong> {{ voter.email }}</p>
+                                <p><strong>Date of Birth:</strong> {{ voter.dob.strftime('%Y-%m-%d') }}</p>
+                                <p><strong>Phone:</strong> {{ voter.phone }}</p>
+                                <p><strong>Verification Time:</strong> {{ voter.last_verified.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Your QR Code</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="qr-container mb-3">
+                                    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="img-fluid">
+                                </div>
+                                <p class="mb-0"><small class="text-muted">Present this QR code for streamlined check-in</small></p>
+                                <p class="mb-0 mt-2"><small class="text-danger">This QR code will expire in 24 hours</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-home me-2"></i>Return to Home
+                    </a>
+                    <button class="btn btn-success" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Print QR Code
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

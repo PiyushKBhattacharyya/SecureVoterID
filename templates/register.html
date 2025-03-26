@@ -1,0 +1,220 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Voter Registration</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <h5 class="mb-1">Registration Process</h5>
+                            <p class="mb-0">Complete this form to register in the voter verification system. You'll need to provide your personal information and capture a clear photo of your face for identity verification.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="registrationForm" action="{{ url_for('register') }}" method="post">
+                    <div class="row">
+                        <!-- Personal Information -->
+                        <div class="col-md-6">
+                            <div class="card bg-dark text-white mb-4">
+                                <div class="card-header bg-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="voter_id" class="form-label">Voter ID*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                            <input type="text" class="form-control" id="voter_id" name="voter_id" required placeholder="Enter your official voter ID">
+                                        </div>
+                                        <div class="form-text">Your unique voter identification number</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Full Name*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="name" name="name" required placeholder="Enter your full legal name">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" class="form-control" id="email" name="email" required placeholder="your.email@example.com">
+                                        </div>
+                                        <div class="form-text">We'll send verification updates to this email</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="dob" class="form-label">Date of Birth*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                            <input type="date" class="form-control" id="dob" name="dob" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Phone Number*</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                            <input type="tel" class="form-control" id="phone" name="phone" required placeholder="(123) 456-7890">
+                                        </div>
+                                        <div class="form-text">For notification purposes only</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Face Capture -->
+                        <div class="col-md-6">
+                            <div class="card bg-dark text-white mb-4">
+                                <div class="card-header bg-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Face Capture</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small">This photo will be used for facial recognition during verification:</p>
+                                    
+                                    <div class="text-center mb-3">
+                                        <div id="webcam-container" class="mb-3">
+                                            <video id="webcam" autoplay playsinline width="100%" height="auto" class="rounded"></video>
+                                            <div class="camera-controls">
+                                                <button type="button" id="capture-btn" class="btn btn-primary">
+                                                    <i class="fas fa-camera"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="captured-container" class="mb-3 d-none">
+                                            <canvas id="captured-image" width="320" height="240" class="rounded"></canvas>
+                                            <div class="camera-controls">
+                                                <button type="button" id="recapture-btn" class="btn btn-warning">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="face_data" name="face_data">
+                                    </div>
+                                    
+                                    <div class="alert alert-secondary">
+                                        <h6 class="mb-2"><i class="fas fa-check-circle me-2"></i>Best Practices:</h6>
+                                        <ul class="small mb-0">
+                                            <li>Ensure good, even lighting on your face</li>
+                                            <li>Remove sunglasses or face coverings</li>
+                                            <li>Look directly at the camera</li>
+                                            <li>Keep a neutral expression</li>
+                                            <li>Use the same appearance you'll have when verifying</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <div class="d-flex">
+                            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Important Notice</h5>
+                                <p class="mb-0">By submitting this form, you consent to the storage and processing of your personal information and facial data for voter verification purposes only. This data will be securely stored and used solely for identity verification during the voting process.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" id="submit-btn" class="btn btn-success btn-lg" disabled>
+                            <i class="fas fa-check-circle me-2"></i>Complete Registration
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('verify') }}" class="text-decoration-none">
+                        <i class="fas fa-user-check me-1"></i> Already registered? Verify your identity here
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/webcam.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize webcam
+        initWebcam('webcam', 'captured-image', 'face_data', 'capture-btn', 'recapture-btn', 'submit-btn', 'webcam-container', 'captured-container');
+        
+        // Form validation
+        const form = document.getElementById('registrationForm');
+        const inputs = form.querySelectorAll('input[required]');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // Check if all required fields are filled and face is captured
+        function checkFormValidity() {
+            const faceData = document.getElementById('face_data').value;
+            let allFieldsFilled = true;
+            
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    allFieldsFilled = false;
+                }
+            });
+            
+            if (allFieldsFilled && faceData) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+        
+        // Add input event listeners to all required fields
+        inputs.forEach(input => {
+            input.addEventListener('input', checkFormValidity);
+        });
+        
+        // Listen for face data changes
+        const faceDataInput = document.getElementById('face_data');
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === "attributes" && mutation.attributeName === "value") {
+                    checkFormValidity();
+                }
+            });
+        });
+        
+        observer.observe(faceDataInput, { attributes: true });
+        
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            if (!document.getElementById('face_data').value) {
+                e.preventDefault();
+                showAlert('Please capture your face before submitting', 'warning');
+            }
+            
+            // Validate email format
+            const email = document.getElementById('email').value;
+            if (!validateEmail(email)) {
+                e.preventDefault();
+                showAlert('Please enter a valid email address', 'warning');
+                return;
+            }
+            
+            // Validate phone format
+            const phone = document.getElementById('phone').value;
+            if (!validatePhone(phone)) {
+                e.preventDefault();
+                showAlert('Please enter a valid phone number', 'warning');
+                return;
+            }
+        });
+    });
+</script>
+{% endblock %}

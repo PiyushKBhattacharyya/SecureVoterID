@@ -1,0 +1,274 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Voter Details</li>
+            </ol>
+        </nav>
+        
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-id-card me-2"></i>Voter Details</h3>
+                <div>
+                    <a href="{{ url_for('admin') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Personal Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th width="40%">Voter ID:</th>
+                                        <td>{{ voter.voter_id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Name:</th>
+                                        <td>{{ voter.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email:</th>
+                                        <td>{{ voter.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date of Birth:</th>
+                                        <td>{{ voter.dob.strftime('%Y-%m-%d') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone:</th>
+                                        <td>{{ voter.phone }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Verification History</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th width="40%">Registration Date:</th>
+                                        <td>{{ voter.registration_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Verified:</th>
+                                        <td>
+                                            {% if voter.last_verified %}
+                                                {{ voter.last_verified.strftime('%Y-%m-%d %H:%M') }}
+                                            {% else %}
+                                                <span class="text-warning">Never verified</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Verification Count:</th>
+                                        <td>
+                                            <span class="badge {% if voter.verification_count > 0 %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
+                                                {{ voter.verification_count }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <div class="mt-3">
+                                    <h6>Verification Status:</h6>
+                                    <div class="progress">
+                                        {% if voter.verification_count == 0 %}
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Never Verified</div>
+                                        {% elif (now - voter.last_verified).days > 30 %}
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: 66%;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">Verified (Inactive)</div>
+                                        {% else %}
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Recently Verified</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if verification_logs %}
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Verification Logs</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Date/Time</th>
+                                        <th>Status</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in verification_logs %}
+                                    <tr>
+                                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                        <td>
+                                            <span class="badge {% if log.success %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if log.success %}Success{% else %}Failed{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>{{ log.details }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('admin') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                    </a>
+                    <div>
+                        <button class="btn btn-info me-2" onclick="generateQRCode('{{ voter.voter_id }}')">
+                            <i class="fas fa-qrcode me-1"></i> Generate QR Code
+                        </button>
+                        <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#resetModal">
+                            <i class="fas fa-redo-alt me-1"></i> Reset Verification
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">Voter QR Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="qr-container mb-3">
+                    <img id="qrCodeImage" src="" alt="QR Code" class="img-fluid">
+                </div>
+                <p class="text-muted small">QR Code valid for 24 hours from generation</p>
+                <p id="qrVoterInfo" class="mt-3"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="printQRCode()">
+                    <i class="fas fa-print me-1"></i> Print QR Code
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Verification Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetModalLabel">Confirm Reset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to reset the verification status for <strong>{{ voter.name }}</strong>?</p>
+                <p>This will:</p>
+                <ul>
+                    <li>Set verification count back to 0</li>
+                    <li>Clear last verification date</li>
+                    <li>Invalidate any existing QR codes</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('reset_verification', voter_id=voter.voter_id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Yes, Reset
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function generateQRCode(voterId) {
+        fetch(`/generate_qr/${voterId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('qrCodeImage').src = 'data:image/png;base64,' + data.qr_code;
+                    document.getElementById('qrVoterInfo').innerHTML = `<strong>${data.voter_name}</strong> (ID: ${data.voter_id})`;
+                    
+                    // Show the modal
+                    const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+                    qrModal.show();
+                } else {
+                    showAlert(data.message || 'Failed to generate QR code', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error generating QR code:', error);
+                showAlert('An error occurred while generating the QR code', 'danger');
+            });
+    }
+
+    function printQRCode() {
+        const printWindow = window.open('', '_blank');
+        const qrCode = document.getElementById('qrCodeImage').src;
+        const voterInfo = document.getElementById('qrVoterInfo').innerHTML;
+        
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Voter QR Code</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; }
+                    .container { max-width: 500px; margin: 50px auto; }
+                    img { max-width: 300px; height: auto; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2>Voter Verification QR Code</h2>
+                    <div>
+                        <img src="${qrCode}" alt="QR Code">
+                    </div>
+                    <p>${voterInfo}</p>
+                    <p><small>Generated on ${new Date().toLocaleString()}</small></p>
+                    <p><small>Valid for 24 hours from generation</small></p>
+                </div>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.focus();
+        
+        // Print after a short delay to allow image loading
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+    }
+</script>
+{% endblock %}

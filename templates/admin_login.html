@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0 text-center"><i class="fas fa-user-shield me-2"></i>Admin Login</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Login with your administrator credentials to access the admin dashboard
+                </div>
+                
+                <form method="post" action="{{ url_for('admin_login') }}">
+                    <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" required autofocus>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Remember me for 30 days</label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer bg-light py-3">
+                <div class="text-center text-muted">
+                    <small>Secure Administrator Access</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-warning mt-4">
+            <div class="d-flex">
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1">Security Notice</h5>
+                    <p class="mb-0">This area is restricted to authorized administrators only. Unauthorized access attempts are logged and may be reported.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focus the username field on page load
+        document.getElementById('username').focus();
+    });
+</script>
+{% endblock %}
